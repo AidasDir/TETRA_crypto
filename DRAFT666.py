@@ -217,7 +217,7 @@ def build_iv(frame):
             ((frame['hn'] & 0x7FFF) << 13) |
             (frame['dir'] << 28))
 
-def prepare_key_stream(tn, fn, mn, hn, sn, direction, eck, key_length, chunk_size=0xFFFFFF):
+def prepare_key_stream(tn, hn, mn, fn, sn, direction, eck, key_length, chunk_size=0xFFFFFF):
 
     # Create OpenCL context
     platforms = cl.get_platforms()
@@ -237,7 +237,13 @@ def prepare_key_stream(tn, fn, mn, hn, sn, direction, eck, key_length, chunk_siz
         raise
 
     # Compute IVs in Python
-    frame = {'tn': 1, 'fn': 6, 'mn': 30, 'hn': 110, 'dir': 0}
+    frame = {
+        'tn': tn,
+        'fn': fn,
+        'mn': mn,
+        'hn': hn,
+        'dir': direction
+    }
     dwIv = build_iv(frame)  # 32-bit IV
     qwIv = tea1_expand_iv(dwIv)  # 64-bit expanded IV
     print(f"Generated dwIv: {dwIv:#010x}")
