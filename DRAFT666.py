@@ -274,10 +274,17 @@ def prepare_key_stream(tn, hn, mn, fn, sn, direction, eck, key_length, chunk_siz
     # Initialize stop flag
     stop_flag = np.zeros(1, dtype=np.uint32)
     cl.enqueue_copy(queue, stop_flag_buf, stop_flag).wait()
-
-    total_range = 0xFFFFFFFF
+    progress = 0
+    total_range = 0xFFFFFFF
+    # Allocate the buffer
     for start in range(0, total_range, chunk_size):
         end = min(start + chunk_size - 1, total_range)
+        progress = progress + 0.1
+        # Update progress bar
+        bar_width = 50
+        filled = int(progress * bar_width)
+        bar = "=" * filled + " " * (bar_width - filled)
+        print(f"[{bar}] {progress * 100:.2f}%", end="\r")
 
         kernel = program.gen_ks
         kernel.set_arg(0, output_buf)
