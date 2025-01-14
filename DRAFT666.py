@@ -270,9 +270,15 @@ def prepare_key_stream(tn, hn, mn, fn, sn, direction, eck, key_length, chunk_siz
 
     output_buf = cl.Buffer(context, cl.mem_flags.WRITE_ONLY, size=buffer_size)
     stop_flag_buf = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4)
-    total_range = 0xFFFFFFF
-    # Allocate the buffer
+
+    # Initialize stop flag
+    stop_flag = np.zeros(1, dtype=np.uint32)
+    cl.enqueue_copy(queue, stop_flag_buf, stop_flag).wait()
+
+    total_range = 0xFFFFFFFF
     for start in range(0, total_range, chunk_size):
+        end = min(start + chunk_size - 1, total_range)
+
         kernel = program.gen_ks
         kernel.set_arg(0, output_buf)
         kernel.set_arg(1, np.uint32(start))
