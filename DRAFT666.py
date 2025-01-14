@@ -1,14 +1,8 @@
 import argparse
 import pyopencl as cl
 import numpy as np
-# Chemin vers le programme externe
-EXTERNAL_PROGRAM = "./external_program"
-
 # Charger et compiler le code OpenCL
 KERNEL_CODE = """
-
-
-
 __constant ushort g_awTea1LutA[8] = { 0xDA86, 0x85E9, 0x29B5, 0x2BC6, 0x8C6B, 0x974C, 0xC671, 0x93E2 };
 __constant ushort g_awTea1LutB[8] = { 0x85D6, 0x791A, 0xE985, 0xC671, 0x2B9C, 0xEC92, 0xC62B, 0x9C47 };
 __constant uchar g_abTea1Sbox[256] = {
@@ -120,7 +114,8 @@ __kernel void gen_ks(__global uchar* output,
         if (ks_combined == match) {  // Match condition
             printf("Counter: %X\\n", counter);
         }
-        if (counter % 0x1000000 == 0){printf("%X\\n",counter);}
+        // FOR DEBUGGING
+        // if (counter % 0x1000000 == 0){printf("%X\\n",counter);}
         // Increment counter and ensure proper wrapping
         counter = (counter + get_global_size(0)) & 0xFFFFFFFF;
     }
@@ -326,7 +321,6 @@ def main():
     print(f"Generating keystream for TEA type {args.tea_type} with frame: hn={args.hn}, mn={args.mn}, fn={args.fn}, sn={args.sn}, dir={args.direction}, eck={args.eck}")
 
     keystream = prepare_key_stream(args.tea_type, args.hn, args.mn, args.fn, args.sn, args.direction, eck, args.key_length, chunk_size=0xFFFFFF)
-
 
 if __name__ == "__main__":
     main()
