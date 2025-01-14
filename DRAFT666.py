@@ -119,11 +119,8 @@ __kernel void gen_ks(__global uchar* output,
         uint ks_combined = (ks_out[0] << 24) | (ks_out[1] << 16) | (ks_out[2] << 8) | ks_out[3];
         if (ks_combined == match) {  // Match condition
             printf("Counter: %X\\n", counter);
-            *stop_flag = 1;  // Signal other threads to stop
-            barrier(CLK_GLOBAL_MEM_FENCE);
-            return;
         }
-        if (counter % 0xFFFFFF == 0){printf("%X\\n",counter);}
+        if (counter % 0x1000000 == 0){printf("%X\\n",counter);}
         // Increment counter and ensure proper wrapping
         counter = (counter + get_global_size(0)) & 0xFFFFFFFF;
     }
